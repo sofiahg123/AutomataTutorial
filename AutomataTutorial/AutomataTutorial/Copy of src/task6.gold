@@ -1,0 +1,43 @@
+using gold.structures.automaton.*
+using gold.visualization.automaton.*
+
+procedure main(args: String[]) begin
+    Σ := {'p','q','r','s','(',')','&','|','=','>','<','!','0',' '} 
+    Q := {"start", "atom", "wait_bin", "not1", "not2", "nand1", "nand2", "nand3"}
+    qI := "start"
+    F := {"atom"}
+    A := GNondeterministicAutomaton(Q, Σ, qI, F, δ)
+    GAutomataFrame.show(A)
+end
+function δ(q, σ) begin
+    if σ = ' ' then return {q} end
+    
+    if q = "start" then
+        if σ ∈ {'p','q','r','s'} then return {"atom"} end
+        if σ = '(' then return {"start"} end
+        if σ = '|' then return {"not1"} end 
+    elseif q = "atom" then
+        if σ = ')' then return {"atom"} end
+        if σ = '&' then return {"wait_bin"} end 
+        if σ = '|' then return {"wait_bin"} end 
+        if σ = '=' then return {"nand1"} end 
+        if σ = '<' then return {"wait_bin"} end 
+    elseif q = "wait_bin" then
+        if σ ∈ {'&', '|', '=', '>', '<'} then return {"start"} end
+    elseif q = "nand1" then
+        if σ = '>' then return {"start"} end 
+        if σ = '|' then return {"nand2"} end 
+    elseif q = "nand2" then 
+        if σ = ')' then return {"nand3"} end
+    elseif q = "nand3" then 
+        if σ = '0' then return {"start"} end 
+    elseif q = "not1" then
+        if σ = '>' then return {"not2"} end
+        if σ = '|' then return {"start"} end
+    elseif q = "not2" then
+        if σ = '0' then return {"start"} end
+    end
+    
+    return {}
+end
+

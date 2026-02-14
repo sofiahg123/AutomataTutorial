@@ -1,0 +1,34 @@
+using gold.structures.automaton.*
+using gold.visualization.automaton.*
+
+procedure main(args: String[]) begin
+    Q := {"init", "A", "B", "C", "W", "Z"}
+    Σ := {'a', 'b'}
+    qI := "init"
+    F := {"C", "Z"}
+    
+    A := GNondeterministicAutomaton(Q, Σ, qI, F, δ)
+    GAutomataFrame.show(A)
+end
+
+function δ(q, σ) begin
+    if q = "init" and σ = 'λ' then return {"A", "W"} end
+    if q = "A" then
+        if σ = 'a' then return {"A", "B"}
+        elseif σ = 'b' then return {"A"}
+        end
+    elseif q = "B" then
+        if σ = 'a' then return {"C"}
+        elseif σ = 'b' then return {"A"}
+        end
+    elseif q = "C" and σ = 'λ' then return {"A"}
+    elseif q = "W" then
+        if σ = 'a' then return {"W"}
+        elseif σ = 'b' then return {"W", "Z"}
+        end
+    elseif q = "Z" then
+        if σ = 'a' or σ = 'b' or σ = 'λ' then return {"Z"} end
+    end
+    
+    return {}
+end
